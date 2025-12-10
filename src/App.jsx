@@ -1,35 +1,63 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react';
 
-function App() {
-  const [count, setCount] = useState(0)
+import './App.css';
+
+import NavBar from './components/NavBar';
+import Footer from './components/Footer';
+import Card from './components/Card';
+
+const options = {
+  method: 'GET',
+  headers: {
+      accept: 'application/json',
+      Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkMjZiMDM3MDBhMmM3YmVkNWVkMjI1YTZkMjY4NjY1NyIsIm5iZiI6MTc2NDc4MzU3OC4xMDcsInN1YiI6IjY5MzA3NWRhYmZmOTAxYzhjYzA3ZmFjMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.G3XYHQfR_GOE_khUNgILnanEpYA_1_J7LtHLYTAWVgE'
+  }
+};
+
+const URL_FETCH = "https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=pt-BR&page=1&sort_by=popularity.desc";
+
+const App = () => {
+
+  const [filmes, setFilmes] = useState([]);
+
+  useEffect(() => {
+    const buscarFilmes = async () => {
+
+      try {
+        
+        const dados = await fetch(URL_FETCH, options).then((resposta) => resposta.json());
+        setFilmes(dados.results);
+        
+      } catch (error) {
+        console.log("Erro ao buscar filmes: ", error);
+      }
+
+    };
+
+    buscarFilmes();
+  }, []);
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+      <NavBar />
 
-export default App
+      <main>
+        <div className="container">
+
+          <h2 className="title">Filmes Populares:</h2>
+
+          <div className="movies-container">
+            {filmes.map((filme) => (
+              <Card key={filme.id} filme={filme} />
+            ))}
+          </div>
+
+        </div>
+      </main>
+
+      <Footer />
+    </>
+  );
+};
+
+export default App;
